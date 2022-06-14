@@ -1,0 +1,51 @@
+using System;
+using System.IO;
+
+namespace sudokuPuzzle_N1034320
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            playingSudoku game = new playingSudoku();
+            Console.Write("Enter your name: ");
+            string playerName = Console.ReadLine();
+            Console.WriteLine();
+            Console.WriteLine("Hello {0}, Welcome to the Sudoku Game.", playerName);
+            Console.WriteLine();
+
+            int size;
+            do
+            {
+                Console.Write("Select the puzzle size 4, 6, 8 or 9: ");
+
+            } while ((!int.TryParse(Console.ReadLine(), out size) || size != 4 && size != 6 && size != 8 && size != 9));
+
+            Console.WriteLine();
+            Console.WriteLine("You have selected {0}*{0} grid.\nThe game is lost after 3 incorrect attempts. Good Luck", size);
+            Console.WriteLine();
+
+            game.constructingSudokuBoard(size);
+            game.displayingSudokuQuestion(size);
+
+            DateTime startTime = DateTime.Now;  //Displaying Game Start Date and Time
+            Console.WriteLine("Game started on {0}", startTime);
+            Console.WriteLine();
+
+            String myGameResult = game.updatingSudokuBoard(size, playerName);
+
+            DateTime endTime = DateTime.Now;  //Displaying Game End Date and Time
+            Console.WriteLine("Game ended on {0}", endTime);
+            Console.WriteLine();
+
+            TimeSpan myPlayTime = endTime - startTime;
+
+            using (StreamWriter resultFile = File.AppendText(playerName + "_GameResult.txt"))  //Appending text to result file
+            {
+                resultFile.WriteLine("{0}\nGame Start Time: {1}\nGame End Time: {2}", myGameResult, startTime, endTime);
+                resultFile.WriteLine("\nElapsed time: {0:00}:{1:00}:{2:00}. \nThanks for playing.", myPlayTime.Hours, myPlayTime.Minutes, myPlayTime.Seconds);
+            }
+
+        }
+    }
+}
