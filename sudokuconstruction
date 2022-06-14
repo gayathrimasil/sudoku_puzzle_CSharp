@@ -1,0 +1,152 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace sudokuPuzzle_N1034320
+{
+    class sudokuConstruction
+    {
+        public int[,] filledSudokuTable;
+        Random generator = new Random();
+
+        //Constructing Filled Sudoku Board
+        public void constructingSudokuBoard(int size)
+        {
+            filledSudokuTable = new int[size, size];
+            for (int boardRow = 0; boardRow < size; boardRow++)
+            {
+                for (int boardColumn = 0; boardColumn < size; boardColumn++)
+                {
+                    combiningRowColumnSubgridCheck(size, boardRow, boardColumn);
+
+                    //Repeating the check if any cell in the row is not filled with unique number
+                    while (filledSudokuTable[boardRow, boardColumn] == 0)
+                    {
+                        for (int columnRepeat = 0; columnRepeat < size; columnRepeat++)
+                        {
+                            combiningRowColumnSubgridCheck(size, boardRow, columnRepeat);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        //Drawing lines between the rows in the Sudoku Table according to table size
+        public void drawingLineBetweenRows(int size)
+        {
+            Console.WriteLine();
+            Console.Write("     ");
+            while (size > 0)
+            {
+                Console.Write("----");
+                size--;
+            }
+        }
+
+        //Displaying column numbers in the Sudoku Table for players convenience
+        public void markingColumnWithIndexNumbers(int size)
+        {
+            Console.Write("      ");
+            for (int columnNumber = 1; columnNumber <= size; columnNumber++)
+            {
+                Console.Write("({0}) ", columnNumber);
+            }
+        }
+
+        //Checking for unique numbers in each row in the Sudoku Table
+        private bool checkingUniqueNumbersInRow(int randomSudokuNumber, int rowNo, int size)
+        {
+            for (int boardColumn = 0; boardColumn < size; boardColumn++)
+            {
+                if (filledSudokuTable[rowNo, boardColumn] == randomSudokuNumber)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        //Checking for unique numbers in each column in the Sudoku Table
+        private bool checkingUniqueNumbersInColumn(int randomSudokuNumber, int columnNo, int size)
+        {
+            for (int boardRow = 0; boardRow < size; boardRow++)
+            {
+                if (filledSudokuTable[boardRow, columnNo] == randomSudokuNumber)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        //Checking for unique numbers within each inner square in the Sudoku Table
+        private bool checkingUniqueNumbersInSubgrid(int randomNumber, int boardRowNo, int boardColumnNo, int size)
+        {
+            int subgridRowCount;
+            int subgridColumnCount;
+
+            if (size == 4) //picking 2*2 square
+            {
+                subgridRowCount = 2;
+                subgridColumnCount = 2;
+            }
+            else if (size == 6) //picking 2*3 square
+            {
+                subgridRowCount = 2;
+                subgridColumnCount = 3;
+            }
+            else if (size == 8) //picking 2*4 square
+            {
+                subgridRowCount = 2;
+                subgridColumnCount = 4;
+            }
+            else //picking 3*3 square
+            {
+                subgridRowCount = 3;
+                subgridColumnCount = 3;
+            }
+
+            int subgridRowStart = boardRowNo - (boardRowNo % subgridRowCount);
+            int subgridColumnStart = boardColumnNo - (boardColumnNo % subgridColumnCount);
+
+            for (boardRowNo = subgridRowStart; boardRowNo < (subgridRowStart + subgridRowCount); boardRowNo++)
+            {
+                for (boardColumnNo = subgridColumnStart; boardColumnNo < subgridColumnStart + subgridColumnCount; boardColumnNo++)
+                {
+                    if (filledSudokuTable[boardRowNo, boardColumnNo] == randomNumber)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        //Combining the Row, Column and Square check together
+        private void combiningRowColumnSubgridCheck(int size, int boardRow, int boardColumn)
+        {
+            List<int> uniqueSudokuNumber = new List<int>();
+            int randomSudokuNumber;
+            int listCount;
+            do
+            {
+                randomSudokuNumber = generator.Next(1, (size + 1));
+                if (!uniqueSudokuNumber.Contains(randomSudokuNumber))
+                {
+                    uniqueSudokuNumber.Add(randomSudokuNumber);
+                    if (checkingUniqueNumbersInRow(randomSudokuNumber, boardRow, size) && checkingUniqueNumbersInColumn(randomSudokuNumber, boardColumn, size) && checkingUniqueNumbersInSubgrid(randomSudokuNumber, boardRow, boardColumn, size))
+                    {
+                        filledSudokuTable[boardRow, boardColumn] = randomSudokuNumber;
+                        break;
+                    }
+                }
+                listCount = uniqueSudokuNumber.Count();
+
+            } while (listCount < size);
+
+        }
+    }
+}
