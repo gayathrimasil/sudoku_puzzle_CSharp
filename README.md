@@ -1,1 +1,1 @@
-# sudoku_puzzle_CSharp
+This code includes C# code for sudoku puzzle. The code itself will generate a unique puzzle everytime and the question will be displayed to the user. There are 3 different level namely Easy, Medium and Hard and different size sudoku puzzle.
