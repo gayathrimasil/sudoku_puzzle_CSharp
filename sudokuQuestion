@@ -1,0 +1,165 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+
+namespace sudokuPuzzle_N1034320
+{
+    class sudokuQuestion : sudokuConstruction
+    {
+        public bool[,] updatedSudokuTable;
+        private int[,] questionSudokuTable;
+
+        Random generator = new Random();
+        //Displaying the question puzzle to the player
+        public void displayingSudokuQuestion(int size)
+        {
+            constructingSudokuQuestionLevelSize(size);
+            Console.WriteLine();
+            int rowMarking = 1;
+
+            markingColumnWithIndexNumbers(size);
+            drawingLineBetweenRows(size);
+
+            for (int boardRow = 0; boardRow < size; boardRow++)
+            {
+                Console.Write("\n ({0}) |", rowMarking);
+                for (int boardColumn = 0; boardColumn < size; boardColumn++)
+                {
+                    if (questionSudokuTable[boardRow, boardColumn] == filledSudokuTable[boardRow, boardColumn])
+                    {
+                        updatedSudokuTable[boardRow, boardColumn] = true;
+                        Console.Write(" {0} |", questionSudokuTable[boardRow, boardColumn]);
+                    }
+                    else
+                    {
+                        Console.Write("   |");
+                    }
+                }
+                drawingLineBetweenRows(size);
+                rowMarking++;
+            }
+            Console.WriteLine("\n");
+        }
+
+        //Constructing the question puzzle 
+        private void constructingSudokuQuestionLevelSize(int size)
+        {
+            this.updatedSudokuTable = new bool[size, size];
+            this.questionSudokuTable = new int[size, size];
+            string difficultyLevel;
+            string sudokuQuestionFileName;
+            int countOfFilledCellDisplayed;
+
+            do
+            {
+                Console.WriteLine("Choose the difficulty level:\nEasy (E)\nMedium (M)\nHard (H)");
+                difficultyLevel = Console.ReadLine().ToLower();
+                Console.WriteLine();
+
+            } while (difficultyLevel != "e" && difficultyLevel != "m" && difficultyLevel != "h");
+
+            if (difficultyLevel == "e" && size == 4)
+            {
+                countOfFilledCellDisplayed = 10;
+                sudokuQuestionFileName = "sudoku_question_size4.txt";
+            }
+            else if (difficultyLevel == "m" && size == 4)
+            {
+                countOfFilledCellDisplayed = 7;
+                sudokuQuestionFileName = "sudoku_question_size4.txt";
+            }
+            else if (difficultyLevel == "h" && size == 4)
+            {
+                countOfFilledCellDisplayed = 5;
+                sudokuQuestionFileName = "sudoku_question_size4.txt";
+            }
+            else if (difficultyLevel == "e" && size == 6)
+            {
+                countOfFilledCellDisplayed = 20;
+                sudokuQuestionFileName = "sudoku_question_size6.txt";
+            }
+            else if (difficultyLevel == "m" && size == 6)
+            {
+                countOfFilledCellDisplayed = 16;
+                sudokuQuestionFileName = "sudoku_question_size6.txt";
+            }
+            else if (difficultyLevel == "h" && size == 6)
+            {
+                countOfFilledCellDisplayed = 12;
+                sudokuQuestionFileName = "sudoku_question_size6.txt";
+            }
+            else if (difficultyLevel == "e" && size == 8)
+            {
+                countOfFilledCellDisplayed = 28;
+                sudokuQuestionFileName = "sudoku_question_size8.txt";
+            }
+            else if (difficultyLevel == "m" && size == 8)
+            {
+                countOfFilledCellDisplayed = 24;
+                sudokuQuestionFileName = "sudoku_question_size8.txt";
+            }
+            else if (difficultyLevel == "h" && size == 8)
+            {
+                countOfFilledCellDisplayed = 20;
+                sudokuQuestionFileName = "sudoku_question_size8.txt";
+            }
+            else if (difficultyLevel == "e" && size == 9)
+            {
+                countOfFilledCellDisplayed = 35;
+                sudokuQuestionFileName = "sudoku_question_size9.txt";
+            }
+            else if (difficultyLevel == "m" && size == 9)
+            {
+                countOfFilledCellDisplayed = 30;
+                sudokuQuestionFileName = "sudoku_question_size9.txt";
+            }
+            else
+            {
+                countOfFilledCellDisplayed = 25;
+                sudokuQuestionFileName = "sudoku_question_size9.txt";
+            }
+
+            string[] fullTextInQuestionFile;
+            string[] sudokuRowColumnNumber;
+            string[] singleRowColumnPosition;
+            List<int> questionPositionDisplay = new List<int>();
+            int listCount = 0;
+            int pickingPositionFromFileRandomly;
+            int questionRowNumber;
+            int questionColumnNumber;
+
+            //Try-Catch for missing text file
+            try
+            {
+                fullTextInQuestionFile = File.ReadAllLines(sudokuQuestionFileName);
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Please create a valid question file");
+                fullTextInQuestionFile = null;
+                Environment.Exit(0);
+            }
+
+            sudokuRowColumnNumber = fullTextInQuestionFile[0].Split(',');
+
+            do
+            {
+                pickingPositionFromFileRandomly = generator.Next(0, (size * size));
+                if (!questionPositionDisplay.Contains(pickingPositionFromFileRandomly))
+                {
+                    questionPositionDisplay.Add(pickingPositionFromFileRandomly);
+                    singleRowColumnPosition = sudokuRowColumnNumber[pickingPositionFromFileRandomly].Split(' ');
+                    questionRowNumber = int.Parse(singleRowColumnPosition[0]);
+                    questionColumnNumber = int.Parse(singleRowColumnPosition[1]);
+                    questionSudokuTable[questionRowNumber, questionColumnNumber] = filledSudokuTable[questionRowNumber, questionColumnNumber];
+                    listCount = questionPositionDisplay.Count();
+                }
+
+            } while (listCount < countOfFilledCellDisplayed);
+
+        }
+
+    }
+}
