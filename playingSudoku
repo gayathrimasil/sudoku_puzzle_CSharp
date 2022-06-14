@@ -1,0 +1,176 @@
+using System;
+using System.IO;
+
+namespace sudokuPuzzle_N1034320
+{
+    class playingSudoku : sudokuQuestion
+    {
+        //Player solving the puzzle
+        public string updatingSudokuBoard(int size, string player)
+        {
+            string gameResult;
+            int incorrectAttempt = 0;
+            char incorrectEntry;
+            char alreadyFilled;
+            do
+            {
+                incorrectEntry = 'N';
+                alreadyFilled = 'N';
+                int playerRowChoice;
+                int playerColumnChoice;
+                int playerInputChoice;
+
+                do
+                {
+                    Console.Write("Enter the Row Number between 1 and {0}: ", size);
+
+                } while (!int.TryParse(Console.ReadLine(), out playerRowChoice) || playerRowChoice < 1 || playerRowChoice > size);
+
+                do
+                {
+                    Console.Write("Enter the Column Number between 1 and {0}: ", size);
+
+                } while (!int.TryParse(Console.ReadLine(), out playerColumnChoice) || playerColumnChoice < 1 || playerColumnChoice > size);
+
+                do
+                {
+                    Console.Write("Enter the sudoku value between 1 to {0}: ", size);
+
+                } while (!int.TryParse(Console.ReadLine(), out playerInputChoice) || playerInputChoice < 1 || playerInputChoice > size);
+
+                int rowMarking = 1;
+                markingColumnWithIndexNumbers(size);
+                drawingLineBetweenRows(size);
+
+                for (int row = 0; row < size; row++)
+                {
+                    Console.Write("\n ({0}) |", rowMarking);
+                    for (int column = 0; column < size; column++)
+                    {
+                        //Checking if the particular cell is already filled
+                        if (row == playerRowChoice - 1 && column == playerColumnChoice - 1 && updatedSudokuTable[row, column] == true)
+                        {
+                            alreadyFilled = 'Y';
+                        }
+
+                        if (updatedSudokuTable[row, column] == true)
+                        {
+                            Console.Write(" {0} |", filledSudokuTable[row, column]);
+                        }
+                        else if (row == playerRowChoice - 1 && column == playerColumnChoice - 1 && filledSudokuTable[row, column] == playerInputChoice)
+                        {
+                            Console.Write(" {0} |", filledSudokuTable[row, column]);
+                            updatedSudokuTable[row, column] = true;
+                        }
+                        else if (row == playerRowChoice - 1 && column == playerColumnChoice - 1 && filledSudokuTable[row, column] != playerInputChoice)
+                        {
+                            incorrectAttempt++;
+                            incorrectEntry = 'Y';
+                            Console.Write("  |");
+                        }
+                        else
+                        {
+                            Console.Write("   |");
+                        }
+                    }
+                    drawingLineBetweenRows(size);
+                    rowMarking++;
+                }
+                Console.WriteLine("\n");
+
+                if (incorrectEntry == 'Y')
+                {
+                    Console.WriteLine("Sorry, wrong guess. Incorrect attempt: {0}/3.\nTry again.", incorrectAttempt);
+                    Console.WriteLine();
+                }
+
+                if (alreadyFilled == 'Y')
+                {
+                    Console.WriteLine("This cell is already filled. Please choose another empty cell");
+                    Console.WriteLine();
+                }
+
+                if (incorrectAttempt == 3)
+                {
+                    gameResult = "Sorry " + player + ", you lost the game.";
+                    Console.WriteLine("Sorry {0}, you lost the game. For further detail, please check the text file \"{0}_GameResult\"", player);
+                    Console.WriteLine();
+                    Console.ReadKey();
+                    break;
+                }
+                else if (!checkingAllTrueBooleanArray(size))
+                {
+                    gameResult = "Congrats " + player + ", you won the game.";
+                    Console.WriteLine("Congrats {0}, you won the game. For further detail, please check the text file \"{0}_GameResult\"", player);
+                    Console.WriteLine();
+                    Console.ReadKey();
+                    break;
+                }
+                else
+                {
+                    gameResult = "";
+                    continue;
+                }
+
+            } while (incorrectAttempt < 3);
+
+            displayingSolvedSudokuBoard(size, player);
+            return gameResult;
+        }
+
+        // Displaying the Sudoku Table finally after generating uniques values in each row, column and square
+        private void displayingSolvedSudokuBoard(int size, string playerName)
+        {
+            string solvedSudokuFileName = playerName + "_GameResult.txt";
+            StreamWriter sudokuSolution = new StreamWriter(solvedSudokuFileName);
+
+            //Drawing lines between the rows in the Sudoku Table according to table size
+            int repeat = 0;
+            sudokuSolution.WriteLine();
+            sudokuSolution.Write("  ");
+            while (repeat < size)
+            {
+                sudokuSolution.Write("----");
+                repeat++;
+            }
+
+            for (int boardRow = 0; boardRow < size; boardRow++)
+            {
+                int lineDrawing = 0;
+                sudokuSolution.Write("\n  |");
+                for (int boardColumn = 0; boardColumn < size; boardColumn++)
+                {
+                    sudokuSolution.Write(" {0} |", filledSudokuTable[boardRow, boardColumn]);
+                }
+
+                //Drawing lines between the rows in the Sudoku Table according to table size
+                sudokuSolution.WriteLine();
+                sudokuSolution.Write("  ");
+                while (lineDrawing < size)
+                {
+                    sudokuSolution.Write("----");
+                    lineDrawing++;
+                }
+            }
+            sudokuSolution.WriteLine("\n");
+            sudokuSolution.Close();
+        }
+
+        //Checking if the Boolean table all True
+        private bool checkingAllTrueBooleanArray(int size)
+        {
+            for (int booleanRow = 0; booleanRow < size; booleanRow++)
+            {
+                for (int booleanColumn = 0; booleanColumn < size; booleanColumn++)
+                {
+                    if (!updatedSudokuTable[booleanRow, booleanColumn])
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+    }
+}
